@@ -5,6 +5,7 @@ on:
   push:
     branches: [main]
     paths:
+      - 'Pengingatku-source-final.zip'
       - 'app/**'
       - 'build.gradle'
       - 'settings.gradle'
@@ -20,6 +21,14 @@ jobs:
     steps:
       - name: Checkout source
         uses: actions/checkout@v4
+
+      - name: Extract uploaded project archive when present
+        run: |
+          if [ -f Pengingatku-source-final.zip ]; then
+            unzip -oq Pengingatku-source-final.zip -d .
+          fi
+          test -f app/build.gradle
+          test -f settings.gradle
 
       - name: Set up Java 17
         uses: actions/setup-java@v4
