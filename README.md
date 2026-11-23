@@ -1,4 +1,4 @@
-# Pengingatku
+# Eling
 
 Aplikasi Android native offline untuk alarm dan catatan melalui widget home screen. Target pengujian: Redmi Note 9 Pro, Android 12.
 
@@ -12,17 +12,17 @@ Aplikasi Android native offline untuk alarm dan catatan melalui widget home scre
 - Widget dapat diubah ukuran melalui handle resize bawaan launcher MIUI/Android.
 
 ## Memasang widget
-1. Instal APK dan buka Pengingatku satu kali.
+1. Instal APK dan buka Eling satu kali.
 2. Tambahkan catatan dan aktifkan bell yang diperlukan.
 3. Izinkan notifikasi (jika diminta) dan akses khusus **Alarms & reminders** agar alarm tepat waktu.
-4. Di Home Screen, tekan lama area kosong → Widget → Pengingatku → seret ke layar.
+4. Di Home Screen, tekan lama area kosong → Widget → Eling → seret ke layar.
 5. Tahan widget untuk memunculkan handle resize launcher.
 
 ## Build APK dari GitHub Actions
 1. Pastikan seluruh isi source project berada di root repository (folder `app/`, `build.gradle`, dan `settings.gradle`).
 2. Buka tab **Actions**.
-3. Jalankan workflow **Build Pengingatku APK**.
-4. Setelah status sukses, buka run tersebut dan unduh artifact **Pengingatku-debug-apk**.
+3. Jalankan workflow **Build Eling APK**.
+4. Setelah status sukses, buka run tersebut dan unduh artifact **Eling-debug-apk**.
 5. Ekstrak ZIP artifact dan instal `app-debug.apk`.
 
 ## Batasan Android widget
