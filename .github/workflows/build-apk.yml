@@ -6,6 +6,7 @@ on:
     branches: [main]
     paths:
       - 'Pengingatku-source-final.zip'
+      - 'Eling-icon.webp.b64'
       - 'app/**'
       - 'build.gradle'
       - 'settings.gradle'
@@ -29,6 +30,17 @@ jobs:
           fi
           test -f app/build.gradle
           test -f settings.gradle
+
+      - name: Apply Eling branding and HD launcher icon
+        run: |
+          mkdir -p app/src/main/res/mipmap-nodpi
+          base64 --decode Eling-icon.webp.b64 > app/src/main/res/mipmap-nodpi/ic_launcher.webp
+          sed -i 's#android:icon="@drawable/ic_app_icon"#android:icon="@mipmap/ic_launcher"#' app/src/main/AndroidManifest.xml
+          sed -i 's#android:label="@string/app_name"#android:label="@string/app_name"#' app/src/main/AndroidManifest.xml
+          sed -i 's#<string name="app_name">[^<]*</string>#<string name="app_name">Eling</string>#; s#<string name="widget_description">[^<]*</string>#<string name="widget_description">Widget alarm dan catatan Eling</string>#' app/src/main/res/values/strings.xml
+          sed -i 's#android:description="@string/widget_description"#android:description="@string/widget_description" android:label="@string/app_name"#' app/src/main/res/xml/taskbell_widget_info.xml
+          sed -i 's/text = "Pengingatku"/text = "Eling"/; s/Widget → Pengingatku/Widget → Eling/' app/src/main/java/com/pengingatku/widget/MainActivity.kt
+          sed -i 's/Pengingatku · Alarm berbunyi/Eling · Alarm berbunyi/g; s/"Pengingatku"/"Eling"/g; s/Pengingatku:AlarmRing/Eling:AlarmRing/g' app/src/main/java/com/pengingatku/widget/AlarmRingService.kt
 
       - name: Make widget layout compatible with RemoteViews
         run: |
