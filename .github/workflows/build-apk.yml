@@ -6,7 +6,7 @@ on:
     branches: [main]
     paths:
       - 'Pengingatku-source-final.zip'
-      - 'Eling-icon.webp.b64'
+      - 'assets/eling_launcher.webp'
       - 'app/**'
       - 'build.gradle'
       - 'settings.gradle'
@@ -31,16 +31,36 @@ jobs:
           test -f app/build.gradle
           test -f settings.gradle
 
-      - name: Apply Eling branding and HD launcher icon
+      - name: Apply Eling branding and launcher icon
         run: |
-          mkdir -p app/src/main/res/mipmap-nodpi
-          base64 --decode Eling-icon.webp.b64 > app/src/main/res/mipmap-nodpi/ic_launcher.webp
-          sed -i 's#android:icon="@drawable/ic_app_icon"#android:icon="@mipmap/ic_launcher"#' app/src/main/AndroidManifest.xml
-          sed -i 's#android:label="@string/app_name"#android:label="@string/app_name"#' app/src/main/AndroidManifest.xml
-          sed -i 's#<string name="app_name">[^<]*</string>#<string name="app_name">Eling</string>#; s#<string name="widget_description">[^<]*</string>#<string name="widget_description">Widget alarm dan catatan Eling</string>#' app/src/main/res/values/strings.xml
-          sed -i 's#android:description="@string/widget_description"#android:description="@string/widget_description" android:label="@string/app_name"#' app/src/main/res/xml/taskbell_widget_info.xml
-          sed -i 's/text = "Pengingatku"/text = "Eling"/; s/Widget → Pengingatku/Widget → Eling/' app/src/main/java/com/pengingatku/widget/MainActivity.kt
-          sed -i 's/Pengingatku · Alarm berbunyi/Eling · Alarm berbunyi/g; s/"Pengingatku"/"Eling"/g; s/Pengingatku:AlarmRing/Eling:AlarmRing/g' app/src/main/java/com/pengingatku/widget/AlarmRingService.kt
+          set -euo pipefail
+          test -s assets/eling_launcher.webp
+          RES="app/src/main/res"
+          mkdir -p "$RES/mipmap-nodpi"
+          find "$RES" -maxdepth 2 -type f \\( -path "$RES/mipmap*" \\) \\( -name 'ic_launcher*' -o -name 'ic_app_icon*' \\) -delete
+          cp assets/eling_launcher.webp "$RES/mipmap-nodpi/ic_launcher.webp"
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          manifest = Path("app/src/main/AndroidManifest.xml")
+          s = manifest.read_text()
+          s, n = re.subn(r'android:(?:roundIcon|icon)="[^"]+"', lambda m: m.group(0).split("=")[0] + '="@mipmap/ic_launcher"', s)
+          if not re.search(r'android:icon=', s):
+              s = re.sub(r'<application\\b', '<application android:icon="@mipmap/ic_launcher" android:roundIcon="@mipmap/ic_launcher"', s, count=1)
+          elif not re.search(r'android:roundIcon=', s):
+              s = re.sub(r'(android:icon="@mipmap/ic_launcher")', r'\\1 android:roundIcon="@mipmap/ic_launcher"', s, count=1)
+          manifest.write_text(s)
+          strings = Path("app/src/main/res/values/strings.xml")
+          s = strings.read_text()
+          if re.search(r'<string name="app_name">.*?</string>', s, re.S):
+              s = re.sub(r'<string name="app_name">.*?</string>', '<string name="app_name">Eling</string>', s, count=1, flags=re.S)
+          else:
+              s = s.replace('</resources>', '    <string name="app_name">Eling</string>\\n</resources>')
+          s = re.sub(r'<string name="widget_description">.*?</string>', '<string name="widget_description">Widget alarm dan catatan Eling</string>', s, count=1, flags=re.S)
+          strings.write_text(s)
+          PY
+          grep -q 'android:icon="@mipmap/ic_launcher"' app/src/main/AndroidManifest.xml
+          test -s "$RES/mipmap-nodpi/ic_launcher.webp"
 
       - name: Make widget layout compatible with RemoteViews
         run: |
