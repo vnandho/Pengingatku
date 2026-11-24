@@ -37,25 +37,26 @@ jobs:
           test -s assets/eling_launcher.webp
           RES="app/src/main/res"
           mkdir -p "$RES/mipmap-nodpi"
-          find "$RES" -maxdepth 2 -type f \( -path "$RES/mipmap*" \) \( -name 'ic_launcher*' -o -name 'ic_app_icon*' \) -delete
+          find "$RES" -maxdepth 2 -type f -name 'ic_launcher*' -delete
+          find "$RES" -maxdepth 2 -type f -name 'ic_app_icon*' -delete
           cp assets/eling_launcher.webp "$RES/mipmap-nodpi/ic_launcher.webp"
           python3 - <<'PY'
           from pathlib import Path
           import re
           manifest = Path("app/src/main/AndroidManifest.xml")
           s = manifest.read_text()
-          s, n = re.subn(r'android:(?:roundIcon|icon)="[^"]+"', lambda m: m.group(0).split("=")[0] + '="@mipmap/ic_launcher"', s)
+          s = re.sub(r'android:(?:roundIcon|icon)="[^"]+"', lambda m: m.group(0).split("=")[0] + '="@mipmap/ic_launcher"', s)
           if not re.search(r'android:icon=', s):
-              s = re.sub(r'<application\\b', '<application android:icon="@mipmap/ic_launcher" android:roundIcon="@mipmap/ic_launcher"', s, count=1)
+              s = re.sub(r'<application\b', '<application android:icon="@mipmap/ic_launcher" android:roundIcon="@mipmap/ic_launcher"', s, count=1)
           elif not re.search(r'android:roundIcon=', s):
-              s = re.sub(r'(android:icon="@mipmap/ic_launcher")', r'\\1 android:roundIcon="@mipmap/ic_launcher"', s, count=1)
+              s = re.sub(r'(android:icon="@mipmap/ic_launcher")', r'\1 android:roundIcon="@mipmap/ic_launcher"', s, count=1)
           manifest.write_text(s)
           strings = Path("app/src/main/res/values/strings.xml")
           s = strings.read_text()
           if re.search(r'<string name="app_name">.*?</string>', s, re.S):
               s = re.sub(r'<string name="app_name">.*?</string>', '<string name="app_name">Eling</string>', s, count=1, flags=re.S)
           else:
-              s = s.replace('</resources>', '    <string name="app_name">Eling</string>\\n</resources>')
+              s = s.replace('</resources>', '    <string name="app_name">Eling</string>\n</resources>')
           s = re.sub(r'<string name="widget_description">.*?</string>', '<string name="widget_description">Widget alarm dan catatan Eling</string>', s, count=1, flags=re.S)
           strings.write_text(s)
           PY
