@@ -37,7 +37,7 @@ jobs:
           test -s assets/eling_launcher.webp
           RES="app/src/main/res"
           mkdir -p "$RES/mipmap-nodpi"
-          find "$RES" -maxdepth 2 -type f \\( -path "$RES/mipmap*" \\) \\( -name 'ic_launcher*' -o -name 'ic_app_icon*' \\) -delete
+          find "$RES" -maxdepth 2 -type f \( -path "$RES/mipmap*" \) \( -name 'ic_launcher*' -o -name 'ic_app_icon*' \) -delete
           cp assets/eling_launcher.webp "$RES/mipmap-nodpi/ic_launcher.webp"
           python3 - <<'PY'
           from pathlib import Path
